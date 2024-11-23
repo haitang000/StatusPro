@@ -5,30 +5,69 @@
 <title>系统状态监控</title>
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #eeeeee;
+    color: #f4f4f4;
     text-align: center;
     padding-top: 50px;
+    transition: background-color 0.3s, color 0.3s;
   }
   .container {
-    background-color: #fff;
+    background-color: #ffffff;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 30px;
     width: 80%;
-    max-width: 600px;
+    max-width: 800px;
     margin: auto;
   }
   h1 {
-    color: #007bff;
+    color: #0080ff;
   }
   .status-item {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
   }
   .status-label {
     font-weight: bold;
-    color: #555;
+    color: #272727;
+    margin-bottom: 5px;
+  }
+  .status-value {
+    font-size: 1.2em;
+    color: #535353;
+  }
+  #toggleDarkMode {
+    background-color: #ddd;
+    font-size: 24px;
+    border: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    position: fixed;
+    bottom: 20px;
+    right: 20px
+  }
+  .dark-mode {
+    background-color: #222;
+    color: #ddd;
+  }
+  .dark-mode .container {
+    background-color: #333;
+  }
+  .dark-mode .status-item {
+    border: 1px solid #444;
+  }
+  .dark-mode .status-value {
+    color: #aaa;
+  }
+  .dark-mode .status-label {
+    color: #fff;
+  }
+  .dark-mode #toggleDarkMode {
+    background-color: #3d3d3d;
   }
 </style>
 </head>
@@ -36,27 +75,39 @@
 <div class="container">
   <h1>系统状态监控</h1>
   <div class="status-item">
-    <span class="status-label" id="cpu-model">CPU型号: 加载中...</span>
+    <div class="status-label">CPU</div>
+    <div class="status-value" id="cpu-info">加载中...</div>
   </div>
   <div class="status-item">
-    <span class="status-label" id="cpu-usage">CPU使用率: 加载中...</span>
+    <div class="status-label">内存使用率</div>
+    <div class="status-value" id="ram-usage">加载中...</div>
   </div>
   <div class="status-item">
-    <span class="status-label" id="ram-usage">内存使用率: 加载中...</span>
+    <div class="status-label">磁盘使用率</div>
+    <div class="status-value" id="disk-usage">加载中...</div>
   </div>
-  <div class="status-item">
-    <span class="status-label" id="disk-usage">磁盘使用率: 加载中...</span>
-  </div>
+  <button id="toggleDarkMode">🌙</button>
 </div>
 <script>
+let isDarkMode = false;
+
+document.getElementById('toggleDarkMode').addEventListener('click', function() {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('dark-mode', isDarkMode);
+  if (isDarkMode) {
+    document.getElementById('toggleDarkMode').textContent = '🌞';
+  } else {
+    document.getElementById('toggleDarkMode').textContent = '🌙';
+  }
+});
+
 setInterval(function() {
   fetch('/status')
     .then(response => response.json())
     .then(data => {
-      document.getElementById('cpu-model').textContent = 'CPU型号: ' + data.cpu_model;
-      document.getElementById('cpu-usage').textContent = 'CPU使用率: ' + data.cpu_usage.toFixed(2) + '%';
-      document.getElementById('ram-usage').textContent = '内存使用率: ' + data.ram_usage.toFixed(2) + '%';
-      document.getElementById('disk-usage').textContent = '磁盘使用率: ' + data.disk_usage.toFixed(2) + '%';
+      document.getElementById('cpu-info').textContent = 'CPU型号: ' + data.cpu_model + ', 使用率: ' + data.cpu_usage.toFixed(2) + '%';
+      document.getElementById('ram-usage').textContent = data.ram_usage.toFixed(2) + '%';
+      document.getElementById('disk-usage').textContent = data.disk_usage.toFixed(2) + '%';
     })
     .catch(error => console.error('Error fetching system status:', error));
 }, 5000); // 更新频率为5秒
