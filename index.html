@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>系统状态监控</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: center;
+    padding-top: 50px;
+  }
+  .container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    width: 80%;
+    max-width: 600px;
+    margin: auto;
+  }
+  h1 {
+    color: #007bff;
+  }
+  .status-item {
+    margin-bottom: 10px;
+  }
+  .status-label {
+    font-weight: bold;
+    color: #555;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>系统状态监控</h1>
+  <div class="status-item">
+    <span class="status-label" id="cpu-model">CPU型号: 加载中...</span>
+  </div>
+  <div class="status-item">
+    <span class="status-label" id="cpu-usage">CPU使用率: 加载中...</span>
+  </div>
+  <div class="status-item">
+    <span class="status-label" id="ram-usage">内存使用率: 加载中...</span>
+  </div>
+  <div class="status-item">
+    <span class="status-label" id="disk-usage">磁盘使用率: 加载中...</span>
+  </div>
+</div>
+<script>
+setInterval(function() {
+  fetch('/status')
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('cpu-model').textContent = 'CPU型号: ' + data.cpu_model;
+      document.getElementById('cpu-usage').textContent = 'CPU使用率: ' + data.cpu_usage.toFixed(2) + '%';
+      document.getElementById('ram-usage').textContent = '内存使用率: ' + data.ram_usage.toFixed(2) + '%';
+      document.getElementById('disk-usage').textContent = '磁盘使用率: ' + data.disk_usage.toFixed(2) + '%';
+    })
+    .catch(error => console.error('Error fetching system status:', error));
+}, 5000); // 更新频率为5秒
+</script>
+</body>
+</html>
